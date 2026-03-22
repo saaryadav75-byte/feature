@@ -1,0 +1,141 @@
+{
+  "theme": "dark",
+  "archetype": "ARCHETYPE 7: ELECTRIC & NEON (Adapted for Cyber-Focus Student Dashboard)",
+  "colors": {
+    "background": "#09090B",
+    "surface": "#121214",
+    "surface_hover": "#18181B",
+    "border": "#27272A",
+    "text_primary": "#FFFFFF",
+    "text_secondary": "#A1A1AA",
+    "text_tertiary": "#71717A",
+    "primary": "#00F0FF",
+    "primary_hover": "#00C2CC",
+    "focus_active": "#39FF14",
+    "distracted_alert": "#FF3B30",
+    "reward_accent": "#FFE600",
+    "food_accent": "#FF007F"
+  },
+  "typography": {
+    "headings": {
+      "family": "Outfit",
+      "weights": ["600", "700", "800"],
+      "tracking": "tracking-tight"
+    },
+    "body": {
+      "family": "Plus Jakarta Sans",
+      "weights": ["400", "500"],
+      "tracking": "tracking-normal"
+    },
+    "mono": {
+      "family": "JetBrains Mono",
+      "weights": ["500", "700"],
+      "tracking": "tracking-tight"
+    },
+    "guidelines": "Never use Inter for headings. Use Outfit for all headers and dashboard card titles. Use JetBrains Mono for the Pomodoro Timer, progress percentages, and any AI confidence scores. Use Plus Jakarta Sans for all other body text. Import from Google Fonts."
+  },
+  "layout_and_spacing": {
+    "strategy": "High Density Bento Grid (Mode B)",
+    "container_padding": "p-6 md:p-8 lg:p-12",
+    "grid_gap": "gap-4 md:gap-6",
+    "card_padding": "p-6",
+    "border_radius": "rounded-2xl",
+    "alignment": "Optical alignment prioritized. Left-align dense content. Top-right for actions/badges in cards."
+  },
+  "surfaces_and_components": {
+    "cards": {
+      "background": "bg-zinc-950",
+      "border": "border border-zinc-800/80",
+      "shadow": "shadow-sm",
+      "hover": "hover:border-zinc-700 transition-colors duration-300"
+    },
+    "glass_header": {
+      "background": "bg-zinc-950/70",
+      "blur": "backdrop-blur-xl",
+      "border": "border-b border-white/5",
+      "shadow": "shadow-[0_4px_30px_rgba(0,0,0,0.1)]",
+      "note": "NEVER use complete transparent backgrounds for overlays or headers."
+    },
+    "timer_card_special": {
+      "background": "bg-zinc-900",
+      "border": "border border-[#00F0FF]/30",
+      "glow": "shadow-[0_0_30px_rgba(0,240,255,0.1)]",
+      "note": "When timer is active, shift glow and border to focus_active color (#39FF14). Use tracing beam effect if possible."
+    },
+    "buttons": {
+      "primary": "bg-[#00F0FF] text-black font-semibold rounded-lg hover:bg-[#00C2CC] transition-all hover:shadow-[0_0_15px_rgba(0,240,255,0.4)]",
+      "secondary": "bg-zinc-800 text-white rounded-lg hover:bg-zinc-700 transition-all",
+      "destructive": "bg-[#FF3B30]/10 text-[#FF3B30] border border-[#FF3B30]/30 hover:bg-[#FF3B30]/20"
+    }
+  },
+  "motion_and_interaction": {
+    "page_transitions": "Fade up with framer-motion (initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 })",
+    "staggered_lists": "Stagger children by 0.05s",
+    "hover_effects": "Slight lift (-translate-y-1) and border color shift for interactive cards.",
+    "micro_interactions": "Pulse animation on the active timer dot. Number ticker for stats (coins, hours studied)."
+  },
+  "visual_enhancers": {
+    "icons": "lucide-react (strokeWidth 1.5, consistent sizing).",
+    "textures": "Subtle noise overlay on the background to kill digital flatness.",
+    "ai_elements": "Use scanning line animation (Tracing Beam) or radar sweep effect for the AI Engagement Analyzer."
+  },
+  "image_urls": [
+    {
+      "url": "https://images.pexels.com/photos/7092524/pexels-photo-7092524.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "category": "Hero / Course Cover",
+      "description": "College student writing notes and using a laptop for exam preparation."
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1763890869725-83a0af1d0b8a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDJ8MHwxfHNlYXJjaHwxfHxzdHVkZW50JTIwc3R1ZHlpbmclMjBsYXB0b3AlMjBmb2N1c3xlbnwwfHx8fDE3NzQxNjMyMjF8MA&ixlib=rb-4.1.0&q=85",
+      "category": "Student Profile / Course Detail",
+      "description": "Person sitting at desk by large window, focused."
+    },
+    {
+      "url": "https://images.pexels.com/photos/6928273/pexels-photo-6928273.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "category": "Food Recommendation",
+      "description": "Mixed nuts and dried fruits in a white bowl, healthy snack."
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1670607231914-605c7b94edd0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MjJ8MHwxfHNlYXJjaHwxfHxoZWFsdGh5JTIwc25hY2slMjBib3dsfGVufDB8fHx8MTc3NDE2MzIyMXww&ixlib=rb-4.1.0&q=85",
+      "category": "Food Recommendation",
+      "description": "Bowl of strawberries, quick energy snack."
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1764303017743-af087219f285?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzV8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMHRlY2glMjBncmlkJTIwZ2xvd2luZ3xlbnwwfHx8fDE3NzQxNjMyMjJ8MA&ixlib=rb-4.1.0&q=85",
+      "category": "AI / Tech Background",
+      "description": "Abstract pattern of glowing teal rectangles on black background (use for AI analyzer module background)."
+    }
+  ],
+  "accessibility": {
+    "contrast": "Ensure all text against dark backgrounds passes WCAG AA (at least 4.5:1).",
+    "focus_states": "focus:ring-2 focus:ring-[#00F0FF] focus:outline-none focus:ring-offset-2 focus:ring-offset-zinc-950",
+    "test_attributes": "Add data-testid to all interactive elements (buttons, inputs, course cards, timer controls)."
+  },
+  "libraries_and_tools": {
+    "charts": "recharts (styled with custom tooltips and neon stroke colors)",
+    "motion": "framer-motion",
+    "components": "shadcn/ui (customized heavily to match dark neon theme)",
+    "notifications": "sonner (positioned top-right, dark theme)"
+  },
+  "instructions_to_main_agent": [
+    "Read the design guidelines carefully and apply them across all pages.",
+    "Prioritize responsive design for mobile users.",
+    "Use mock AI engagement detection simulating focused, tired, distracted states with visual indicators.",
+    "Build the dashboard using a bento grid structure.",
+    "Ensure all components use the defined typography and spacing system.",
+    "Use lucide-react for all iconography."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "DO NOT use Inter, Roboto, or standard sans-serif for headings. Stick to Outfit and Plus Jakarta Sans.",
+    "NEVER use generic centered layouts or simplistic gradients.",
+    "Create depth using layered design elements with z-index hierarchy and subtle glowing borders.",
+    "Use glass-morphism effects with backdrop-blur-xl and low-opacity borders.",
+    "DO NOT apply universal transitions (e.g. `transition: all`). Use specific transitions like `transition-colors`, `transition-transform`.",
+    "NEVER center align the app container (`.App { text-align: center; }`). Keep text naturally aligned.",
+    "Use modern pill-shaped or rounded-lg buttons with interaction animations.",
+    "NEVER use emoji characters for icons. ALWAYS use lucide-react.",
+    "Add micro-animations (hover states, active states, loading skeletons) to every interactive element.",
+    "Use 2-3x more spacing than typical for breathing room, especially inside cards (`p-6` or `p-8`).",
+    "Prioritize optical alignment over geometric alignment."
+  ]
+}
