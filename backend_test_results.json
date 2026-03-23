@@ -1,0 +1,78 @@
+{
+  "timestamp": "2026-03-23T08:41:45.628654",
+  "total_tests": 14,
+  "passed_tests": 11,
+  "success_rate": 78.57142857142857,
+  "results": [
+    {
+      "test": "Root Endpoint",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "User Login",
+      "status": "FAILED",
+      "details": "Expected 200, got 400. Response: {\"detail\":\"Invalid credentials\"}"
+    },
+    {
+      "test": "User Registration",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Get Current User",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Dashboard Stats",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Courses List",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Course Enrollment",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Course Details",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Course Lessons",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "User Progress",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Food Items List",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Food Recommendations",
+      "status": "PASSED",
+      "details": ""
+    },
+    {
+      "test": "Create Food Order",
+      "status": "FAILED",
+      "details": "No food items available for order"
+    },
+    {
+      "test": "Focus Sessions List",
+      "status": "FAILED",
+      "details": "Expected 200, got 404. Response: {\"detail\":\"Not Found\"}"
+    }
+  ]
+}
