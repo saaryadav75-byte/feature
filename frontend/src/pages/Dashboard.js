@@ -18,6 +18,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [courses, setCourses] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [heatmapData, setHeatmapData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,13 +27,15 @@ export default function Dashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const [statsRes, coursesRes] = await Promise.all([
+      const [statsRes, coursesRes, heatmapRes] = await Promise.all([
         api.get('/dashboard/stats'),
-        api.get('/courses')
+        api.get('/courses'),
+        api.get(`/analytics/heatmap/${user.id}`)
       ]);
       
       setStats(statsRes.data);
       setCourses(coursesRes.data);
+      setHeatmapData(heatmapRes.data);
       
       const enrollmentsPromises = coursesRes.data.map(course =>
         api.get(`/progress/course/${course.id}`).catch(() => null)
@@ -210,6 +213,58 @@ export default function Dashboard() {
                       </div>
                     </motion.div>
                   ))
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Study Heatmap */}
+            <Card className="border-zinc-800 bg-zinc-950">
+              <CardHeader>
+                <CardTitle className="text-2xl flex items-center gap-2" style={{ fontFamily: 'Outfit' }}>
+                  <TrendingUp className="w-6 h-6 text-[#39FF14]" />
+                  Study Activity Heatmap
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-4">
+                  <p className="text-sm text-zinc-400">Your study activity over the past year</p>
+                </div>
+                {heatmapData.length > 0 ? (
+                  <div className="overflow-x-auto pb-2">
+                    <div className="inline-flex gap-1 flex-wrap max-w-full">
+                      {heatmapData.slice(-365).map((day, idx) => {
+                        const level = day.level;
+                        const colors = ['#27272A', '#39FF1433', '#39FF1466', '#39FF1499', '#39FF14'];
+                        const bgColor = colors[level] || colors[0];
+                        return (
+                          <div
+                            key={idx}
+                            className="w-3 h-3 rounded-sm transition-transform hover:scale-125 cursor-pointer"
+                            style={{ backgroundColor: bgColor }}
+                            title={`${day.date}: ${day.value.toFixed(0)} mins`}
+                          />
+                        );
+                      })}
+                    </div>
+                    <div className="flex items-center gap-2 mt-4 text-xs text-zinc-500">
+                      <span>Less</span>
+                      <div className="flex gap-1">
+                        {[0, 1, 2, 3, 4].map((level) => (
+                          <div
+                            key={level}
+                            className="w-3 h-3 rounded-sm"
+                            style={{ backgroundColor: ['#27272A', '#39FF1433', '#39FF1466', '#39FF1499', '#39FF14'][level] }}
+                          />
+                        ))}
+                      </div>
+                      <span>More</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-zinc-500">
+                    <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p>Start learning to see your activity heatmap!</p>
+                  </div>
                 )}
               </CardContent>
             </Card>
