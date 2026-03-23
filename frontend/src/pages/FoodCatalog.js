@@ -28,80 +28,12 @@ export default function FoodCatalog() {
         api.get('/food-items/recommend')
       ]);
       
-      if (itemsRes.data.length === 0) {
-        await seedFoodItems();
-        const newItemsRes = await api.get('/food-items');
-        setFoodItems(newItemsRes.data);
-      } else {
-        setFoodItems(itemsRes.data);
-      }
-      
+      setFoodItems(itemsRes.data);
       setRecommendations(recoRes.data.recommended || []);
     } catch (error) {
       console.error('Failed to fetch food data:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const seedFoodItems = async () => {
-    const sampleItems = [
-      {
-        name: 'Energy Smoothie Bowl',
-        category: 'breakfast',
-        price: 8.99,
-        image: 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg',
-        nutrition_score: 9,
-        description: 'Packed with fruits, nuts, and energy-boosting ingredients'
-      },
-      {
-        name: 'Brain Food Salad',
-        category: 'lunch',
-        price: 12.50,
-        image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
-        nutrition_score: 10,
-        description: 'Fresh greens with omega-3 rich salmon and walnuts'
-      },
-      {
-        name: 'Mixed Nuts & Berries',
-        category: 'snack',
-        price: 5.99,
-        image: 'https://images.pexels.com/photos/6928273/pexels-photo-6928273.jpeg',
-        nutrition_score: 8,
-        description: 'Perfect study snack for sustained energy'
-      },
-      {
-        name: 'Protein Power Bowl',
-        category: 'lunch',
-        price: 14.99,
-        image: 'https://images.pexels.com/photos/1640772/pexels-photo-1640772.jpeg',
-        nutrition_score: 9,
-        description: 'Quinoa, grilled chicken, and fresh vegetables'
-      },
-      {
-        name: 'Green Energy Juice',
-        category: 'snack',
-        price: 6.50,
-        image: 'https://images.pexels.com/photos/1346347/pexels-photo-1346347.jpeg',
-        nutrition_score: 8,
-        description: 'Refreshing blend of greens and fruits'
-      },
-      {
-        name: 'Mediterranean Wrap',
-        category: 'dinner',
-        price: 11.99,
-        image: 'https://images.pexels.com/photos/1639562/pexels-photo-1639562.jpeg',
-        nutrition_score: 9,
-        description: 'Healthy wrap with hummus and grilled vegetables'
-      }
-    ];
-
-    for (const item of sampleItems) {
-      try {
-        await api.post('/food-items', item);
-      } catch (error) {
-        console.log('Skipping item, might already exist');
-      }
     }
   };
 

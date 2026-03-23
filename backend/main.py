@@ -7,6 +7,7 @@ from pathlib import Path
 
 from models.database import connect_to_mongo, close_mongo_connection
 from routers import auth, courses, lessons, progress, focus_sessions, food, dashboard
+from utils.seed import seed_database
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -37,6 +38,7 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     await connect_to_mongo()
+    await seed_database()
     logging.info("Application started successfully")
 
 @app.on_event("shutdown")
