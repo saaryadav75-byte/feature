@@ -18,7 +18,8 @@ async def seed_demo_users():
             "role": "student",
             "created_at": datetime.now(timezone.utc).isoformat(),
             "coins": 50,
-            "total_study_hours": 3.5
+            "total_study_hours": 3.5,
+            "total_xp": 150
         },
         {
             "id": "user_demo_instructor",
@@ -28,7 +29,8 @@ async def seed_demo_users():
             "role": "instructor",
             "created_at": datetime.now(timezone.utc).isoformat(),
             "coins": 100,
-            "total_study_hours": 20.0
+            "total_study_hours": 20.0,
+            "total_xp": 500
         }
     ]
     
@@ -222,7 +224,59 @@ async def seed_database():
         await seed_demo_users()
         await seed_food_items()
         await seed_sample_courses()
+        await seed_achievements()
         logger.info("Database seeding completed successfully")
     except Exception as e:
         logger.error(f"Error during database seeding: {e}")
         raise
+
+async def seed_achievements():
+    """Seed achievement definitions"""
+    db = get_db()
+    
+    achievements = [
+        {
+            "id": "ach_first_hour",
+            "name": "First Hour",
+            "description": "Complete 1 hour of study",
+            "icon": "⏰",
+            "coins_reward": 10,
+            "requirement_type": "study_hours",
+            "requirement_value": 1.0
+        },
+        {
+            "id": "ach_early_bird",
+            "name": "Early Bird",
+            "description": "Complete 5 focus sessions",
+            "icon": "🌅",
+            "coins_reward": 25,
+            "requirement_type": "sessions",
+            "requirement_value": 5
+        },
+        {
+            "id": "ach_streak_master",
+            "name": "Streak Master",
+            "description": "Maintain a 7-day study streak",
+            "icon": "🔥",
+            "coins_reward": 50,
+            "requirement_type": "streak",
+            "requirement_value": 7
+        },
+        {
+            "id": "ach_course_complete",
+            "name": "Course Completer",
+            "description": "Complete your first course",
+            "icon": "🎓",
+            "coins_reward": 100,
+            "requirement_type": "courses_completed",
+            "requirement_value": 1
+        }
+    ]
+    
+    for achievement in achievements:
+        existing = await db.achievements.find_one({"id": achievement["id"]}, {"_id": 0})
+        if not existing:
+            await db.achievements.insert_one(achievement)
+            logger.info(f"Created achievement: {achievement['name']}")
+        else:
+            logger.info(f"Achievement already exists: {achievement['name']}")

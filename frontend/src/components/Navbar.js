@@ -58,6 +58,16 @@ export default function Navbar() {
               <UtensilsCrossed className="w-4 h-4" />
               Food
             </Link>
+            <Link
+              to="/profile"
+              className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                isActive('/profile') ? 'text-[#00F0FF]' : 'text-zinc-400 hover:text-white'
+              }`}
+              data-testid="nav-profile"
+            >
+              <User className="w-4 h-4" />
+              Profile
+            </Link>
             <Button
               onClick={handleLogout}
               variant="ghost"

@@ -11,6 +11,9 @@ import CourseDetail from './pages/CourseDetail';
 import CreateCourse from './pages/CreateCourse';
 import LessonViewer from './pages/LessonViewer';
 import FoodCatalog from './pages/FoodCatalog';
+import Profile from './pages/Profile';
+import Leaderboard from './pages/Leaderboard';
+import OrderHistory from './pages/OrderHistory';
 import '@/App.css';
 
 const ProtectedRoute = ({ children }) => {
@@ -62,6 +65,9 @@ const AppContent = () => {
         <Route path="/create-course" element={<ProtectedRoute><CreateCourse /></ProtectedRoute>} />
         <Route path="/lessons/:lessonId" element={<ProtectedRoute><LessonViewer /></ProtectedRoute>} />
         <Route path="/food" element={<ProtectedRoute><FoodCatalog /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+        <Route path="/orders/history" element={<ProtectedRoute><OrderHistory /></ProtectedRoute>} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
       <Toaster 

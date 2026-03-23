@@ -6,7 +6,7 @@ import logging
 from pathlib import Path
 
 from models.database import connect_to_mongo, close_mongo_connection
-from routers import auth, courses, lessons, progress, focus_sessions, food, dashboard
+from routers import auth, courses, lessons, progress, focus_sessions, food, dashboard, gamification, learning, analytics, checkout
 from utils.seed import seed_database
 
 ROOT_DIR = Path(__file__).parent
@@ -24,6 +24,10 @@ api_router.include_router(focus_sessions.router)
 api_router.include_router(food.router)
 api_router.include_router(food.router_orders)
 api_router.include_router(dashboard.router)
+api_router.include_router(gamification.router)
+api_router.include_router(learning.router)
+api_router.include_router(analytics.router)
+api_router.include_router(checkout.router)
 
 app.include_router(api_router)
 
