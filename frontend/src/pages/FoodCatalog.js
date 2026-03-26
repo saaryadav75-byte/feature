@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card'
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { motion } from 'framer-motion';
-import { ShoppingCart, Plus, Minus, Sparkles, Clock, TrendingUp, Coffee } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Sparkles, Clock, TrendingUp, Coffee, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function FoodCatalog() {
@@ -14,8 +14,17 @@ export default function FoodCatalog() {
   const navigate = useNavigate();
   const [foodItems, setFoodItems] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+    // Load cart from localStorage on mount
+    const savedCart = localStorage.getItem('cart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
   const [loading, setLoading] = useState(true);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
 
   useEffect(() => {
     fetchFoodData();
@@ -55,13 +64,21 @@ export default function FoodCatalog() {
   };
 
   const updateQuantity = (foodId, delta) => {
-    setCart(cart.map(item => {
+    const updatedCart = cart.map(item => {
       if (item.food_id === foodId) {
         const newQuantity = item.quantity + delta;
-        return newQuantity > 0 ? { ...item, quantity: newQuantity } : item;
+        return { ...item, quantity: newQuantity };
       }
       return item;
-    }).filter(item => item.quantity > 0));
+    }).filter(item => item.quantity > 0);
+    
+    setCart(updatedCart);
+    
+    // Show notification when item is removed
+    const removedItem = cart.find(item => item.food_id === foodId && item.quantity + delta <= 0);
+    if (removedItem) {
+      toast.info(`${removedItem.food_name} removed from cart`, { icon: '🗑️' });
+    }
   };
 
   const handleCheckout = async () => {
@@ -74,6 +91,7 @@ export default function FoodCatalog() {
       const response = await api.post('/orders', { items: cart });
       toast.success(`Order placed! Total: $${response.data.final_price.toFixed(2)} (${(response.data.discount / response.data.total * 100).toFixed(0)}% discount applied)`);
       setCart([]);
+      localStorage.removeItem('cart'); // Clear cart from localStorage
     } catch (error) {
       toast.error('Failed to place order');
     }
@@ -249,7 +267,7 @@ export default function FoodCatalog() {
                           >
                             <Minus className="w-3 h-3" />
                           </Button>
-                          <span className="text-sm font-bold w-6 text-center" style={{ fontFamily: 'JetBrains Mono' }}>
+                          <span className="text-sm font-bold w-8 text-center" style={{ fontFamily: 'JetBrains Mono' }}>
                             {cartItem.quantity}
                           </span>
                           <Button
@@ -262,6 +280,19 @@ export default function FoodCatalog() {
                             <Plus className="w-3 h-3" />
                           </Button>
                         </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 w-7 p-0 text-zinc-500 hover:text-red-400 hover:bg-red-400/10"
+                          onClick={() => {
+                            setCart(cart.filter(item => item.food_id !== cartItem.food_id));
+                            toast.info(`${cartItem.food_name} removed from cart`, { icon: '🗑️' });
+                          }}
+                          data-testid={`remove-item-${cartItem.food_id}`}
+                          title="Remove item"
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
                       </div>
                     ))}
 
