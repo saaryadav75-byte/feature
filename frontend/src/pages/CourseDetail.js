@@ -85,7 +85,7 @@ export default function CourseDetail() {
   const overallProgress = lessons.length > 0 ? (completedLessons / lessons.length) * 100 : 0;
 
   return (
-    <div className="min-h-screen p-6 lg:p-12 noise-bg" style={{ background: '#09090B' }} data-testid="course-detail-page">
+    <div className="min-h-screen p-6 lg:p-12 noise-bg bg-slate-50 dark:bg-white dark:bg-zinc-950" data-testid="course-detail-page">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -102,7 +102,7 @@ export default function CourseDetail() {
 
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
-              <Card className="border-zinc-800 bg-zinc-950">
+              <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
                 <div className="aspect-video bg-gradient-to-br from-[#00F0FF]/20 to-[#39FF14]/20 flex items-center justify-center">
                   <BookOpen className="w-24 h-24 text-[#00F0FF] opacity-50" />
                 </div>
@@ -119,7 +119,7 @@ export default function CourseDetail() {
                 </CardContent>
               </Card>
 
-              <Card className="border-zinc-800 bg-zinc-950">
+              <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
                 <CardHeader>
                   <CardTitle className="text-2xl flex items-center gap-2" style={{ fontFamily: 'Outfit' }}>
                     <Play className="w-6 h-6 text-[#00F0FF]" />
@@ -143,8 +143,8 @@ export default function CourseDetail() {
                           whileHover={canAccess ? { x: 4 } : {}}
                           className={`p-4 rounded-xl border transition-all ${
                             canAccess
-                              ? 'bg-zinc-900 border-zinc-800 hover:border-zinc-700 cursor-pointer'
-                              : 'bg-zinc-900/50 border-zinc-800/50 opacity-60'
+                              ? 'bg-zinc-900 border-zinc-200 dark:border-zinc-800 hover:border-zinc-700 cursor-pointer'
+                              : 'bg-zinc-900/50 border-zinc-200 dark:border-zinc-800/50 opacity-60'
                           }`}
                           onClick={() => canAccess && navigate(`/lessons/${lesson.id}`)}
                           data-testid={`lesson-item-${lesson.id}`}
@@ -202,7 +202,7 @@ export default function CourseDetail() {
                         </div>
                         <Progress value={overallProgress} className="h-3" />
                       </div>
-                      <div className="grid grid-cols-2 gap-3 pt-4 border-t border-zinc-800">
+                      <div className="grid grid-cols-2 gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
                         <div>
                           <p className="text-xs text-zinc-500 mb-1">Completed</p>
                           <p className="text-2xl font-bold" style={{ fontFamily: 'JetBrains Mono', color: '#39FF14' }}>
@@ -237,7 +237,7 @@ export default function CourseDetail() {
                 </Card>
               )}
 
-              <Card className="border-zinc-800 bg-zinc-950">
+              <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
                 <CardHeader>
                   <CardTitle className="text-lg" style={{ fontFamily: 'Outfit' }}>What You'll Learn</CardTitle>
                 </CardHeader>

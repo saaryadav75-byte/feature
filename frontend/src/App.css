@@ -1,6 +1,6 @@
 .App {
   min-height: 100vh;
-  background: #09090B;
+  background: #f8fafc;
 }
 
 .App-header {
@@ -17,10 +17,10 @@
 }
 
 .glass-card {
-  background: rgba(18, 18, 20, 0.7);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
 }
 
 .neon-border {

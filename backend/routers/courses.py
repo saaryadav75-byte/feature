@@ -3,76 +3,122 @@ from datetime import datetime, timezone
 from typing import List
 from schemas.course import Course, CourseCreate, Lesson, LessonCreate
 from utils.auth import get_current_user
-from models.database import get_db
+from models.database import get_supabase_client
 
 router = APIRouter(prefix="/courses", tags=["courses"])
 
 @router.get("", response_model=List[Course])
 async def get_courses(current_user: dict = Depends(get_current_user)):
-    db = get_db()
-    courses = await db.courses.find({}, {"_id": 0}).to_list(100)
-    return [Course(**c) for c in courses]
+    client = get_supabase_client()
+    if not client:
+        return []  # Return empty list if database not available
+    
+    try:
+        response = client.table('courses').select('*').order('created_at', desc=True).execute()
+        return [Course(**row) for row in response.data]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching courses: {str(e)}")
 
 @router.post("", response_model=Course)
 async def create_course(course_data: CourseCreate, current_user: dict = Depends(get_current_user)):
     if current_user['role'] not in ['instructor', 'admin']:
         raise HTTPException(status_code=403, detail="Only instructors can create courses")
-    
-    db = get_db()
-    user = await db.users.find_one({"id": current_user['user_id']}, {"_id": 0})
-    course_id = f"course_{datetime.now(timezone.utc).timestamp()}"
-    
-    course_doc = {
-        "id": course_id,
-        "title": course_data.title,
-        "description": course_data.description,
-        "instructor_id": current_user['user_id'],
-        "instructor_name": user['name'],
-        "thumbnail": course_data.thumbnail,
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "students_enrolled": 0
-    }
-    
-    await db.courses.insert_one(course_doc)
-    return Course(**course_doc)
+
+    client = get_supabase_client()
+    if not client:
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable")
+
+    try:
+        # Get user name
+        user_response = client.table('users').select('name').eq('id', current_user['user_id']).execute()
+        if not user_response.data:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        user_name = user_response.data[0]['name']
+        course_id = f"course_{datetime.now(timezone.utc).timestamp()}"
+
+        course_insert = {
+            'id': course_id,
+            'title': course_data.title,
+            'description': course_data.description,
+            'instructor_id': current_user['user_id'],
+            'instructor_name': user_name,
+            'thumbnail': course_data.thumbnail,
+            'created_at': datetime.now(timezone.utc).isoformat(),
+            'students_enrolled': 0
+        }
+        
+        client.table('courses').insert(course_insert).execute()
+
+        return Course(**course_insert)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating course: {str(e)}")
 
 @router.get("/{course_id}", response_model=Course)
 async def get_course(course_id: str, current_user: dict = Depends(get_current_user)):
-    db = get_db()
-    course = await db.courses.find_one({"id": course_id}, {"_id": 0})
-    if not course:
-        raise HTTPException(status_code=404, detail="Course not found")
-    return Course(**course)
+    client = get_supabase_client()
+    if not client:
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable")
+    
+    try:
+        response = client.table('courses').select('*').eq('id', course_id).execute()
+        if not response.data:
+            raise HTTPException(status_code=404, detail="Course not found")
+        return Course(**response.data[0])
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching course: {str(e)}")
 
 @router.post("/{course_id}/enroll")
 async def enroll_course(course_id: str, current_user: dict = Depends(get_current_user)):
-    db = get_db()
-    course = await db.courses.find_one({"id": course_id}, {"_id": 0})
-    if not course:
-        raise HTTPException(status_code=404, detail="Course not found")
-    
-    existing = await db.enrollments.find_one({
-        "user_id": current_user['user_id'],
-        "course_id": course_id
-    }, {"_id": 0})
-    
-    if existing:
-        return {"message": "Already enrolled"}
-    
-    enrollment_doc = {
-        "id": f"enrollment_{datetime.now(timezone.utc).timestamp()}",
-        "user_id": current_user['user_id'],
-        "course_id": course_id,
-        "enrolled_at": datetime.now(timezone.utc).isoformat()
-    }
-    
-    await db.enrollments.insert_one(enrollment_doc)
-    await db.courses.update_one({"id": course_id}, {"$inc": {"students_enrolled": 1}})
-    
-    return {"message": "Enrolled successfully"}
+    client = get_supabase_client()
+    if not client:
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable")
+
+    try:
+        # Check if course exists
+        course_response = client.table('courses').select('id').eq('id', course_id).execute()
+        if not course_response.data:
+            raise HTTPException(status_code=404, detail="Course not found")
+
+        # Check if already enrolled
+        existing_response = client.table('enrollments').select('id').eq('user_id', current_user['user_id']).eq('course_id', course_id).execute()
+        if existing_response.data:
+            return {"message": "Already enrolled"}
+
+        # Create enrollment
+        enrollment_id = f"enrollment_{datetime.now(timezone.utc).timestamp()}"
+        
+        enrollment_data = {
+            'id': enrollment_id,
+            'user_id': current_user['user_id'],
+            'course_id': course_id,
+            'enrolled_at': datetime.now(timezone.utc).isoformat()
+        }
+        client.table('enrollments').insert(enrollment_data).execute()
+
+        # Update course enrollment count
+        course_data = client.table('courses').select('students_enrolled').eq('id', course_id).execute()
+        current_count = course_data.data[0]['students_enrolled'] if course_data.data else 0
+        client.table('courses').update({'students_enrolled': current_count + 1}).eq('id', course_id).execute()
+
+        return {"message": "Enrolled successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error enrolling in course: {str(e)}")
 
 @router.get("/{course_id}/lessons", response_model=List[Lesson])
 async def get_lessons(course_id: str, current_user: dict = Depends(get_current_user)):
-    db = get_db()
-    lessons = await db.lessons.find({"course_id": course_id}, {"_id": 0}).sort("order", 1).to_list(100)
-    return [Lesson(**l) for l in lessons]
+    client = get_supabase_client()
+    if not client:
+        return []  # Return empty list if database not available
+    
+    try:
+        response = client.table('lessons').select('*').eq('course_id', course_id).order('order_index', desc=False).execute()
+        return [Lesson(**row) for row in response.data]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching lessons: {str(e)}")

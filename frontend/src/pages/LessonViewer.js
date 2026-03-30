@@ -290,7 +290,7 @@ export default function LessonViewer() {
     : ((25 * 60 - timeLeft) / (25 * 60)) * 100;
 
   return (
-    <div className="min-h-screen p-6 lg:p-12 noise-bg" style={{ background: '#09090B' }} data-testid="lesson-viewer-page">
+    <div className="min-h-screen p-6 lg:p-12 noise-bg bg-slate-50 dark:bg-white dark:bg-zinc-950" data-testid="lesson-viewer-page">
       <div className="max-w-7xl mx-auto">
         <Button
           onClick={() => navigate(-1)}
@@ -308,14 +308,14 @@ export default function LessonViewer() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <Card className="border-zinc-800 bg-zinc-950" data-testid="lesson-content-card">
+              <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950" data-testid="lesson-content-card">
                 <CardContent className="p-8">
                   <h1 className="text-3xl lg:text-4xl font-bold mb-4" style={{ fontFamily: 'Outfit' }}>
                     {lesson.title}
                   </h1>
                   
                   {lesson.video_url && (
-                    <div className="aspect-video bg-zinc-900 rounded-xl mb-6 flex items-center justify-center border border-zinc-800 relative overflow-hidden group">
+                    <div className="aspect-video bg-zinc-900 rounded-xl mb-6 flex items-center justify-center border border-zinc-200 dark:border-zinc-800 relative overflow-hidden group">
                       <div className="absolute inset-0 bg-gradient-to-br from-[#00F0FF]/10 to-[#39FF14]/10"></div>
                       <div className="relative text-center z-10">
                         <Video className="w-16 h-16 text-[#00F0FF] mx-auto mb-4 group-hover:scale-110 transition-transform" />
@@ -331,7 +331,7 @@ export default function LessonViewer() {
                     </div>
                   </div>
 
-                  <div className="mt-8 p-6 rounded-xl bg-gradient-to-br from-[#00F0FF]/5 to-[#39FF14]/5 border border-zinc-800">
+                  <div className="mt-8 p-6 rounded-xl bg-gradient-to-br from-[#00F0FF]/5 to-[#39FF14]/5 border border-zinc-200 dark:border-zinc-800">
                     <h3 className="text-lg font-bold mb-3 flex items-center gap-2" style={{ fontFamily: 'Outfit' }}>
                       <BookOpen className="w-5 h-5 text-[#00F0FF]" />
                       Lesson Notes
@@ -428,7 +428,7 @@ export default function LessonViewer() {
 
                   {/* Pomodoro Counter */}
                   {pomodoroCount > 0 && (
-                    <div className="mb-4 p-3 rounded-lg bg-zinc-950 border border-zinc-800">
+                    <div className="mb-4 p-3 rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
                       <p className="text-sm text-zinc-400">Sessions Completed Today</p>
                       <p className="text-3xl font-bold" style={{ fontFamily: 'JetBrains Mono', color: '#39FF14' }}>
                         {pomodoroCount}
@@ -437,7 +437,7 @@ export default function LessonViewer() {
                   )}
 
                   {/* AI Detection Toggle */}
-                  <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800">
+                  <div className="p-4 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-sm font-medium">AI Engagement</span>
                       <Switch
@@ -484,7 +484,7 @@ export default function LessonViewer() {
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="mt-4 p-3 rounded-lg bg-zinc-950 border border-zinc-800"
+                      className="mt-4 p-3 rounded-lg bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800"
                     >
                       <p className="text-xs text-zinc-500 mb-2">Session Stats</p>
                       <div className="grid grid-cols-3 gap-2 text-center">
@@ -514,7 +514,7 @@ export default function LessonViewer() {
             </Card>
 
             {/* Study Tips */}
-            <Card className="border-zinc-800 bg-zinc-950">
+            <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <Sparkles className="w-5 h-5 text-[#FFE600]" />
@@ -542,7 +542,7 @@ export default function LessonViewer() {
             </Card>
 
             {/* Break Suggestion */}
-            <Card className="border-zinc-800 bg-gradient-to-br from-[#FF007F]/10 to-[#FFE600]/10">
+            <Card className="border-zinc-200 dark:border-zinc-800 bg-gradient-to-br from-[#FF007F]/10 to-[#FFE600]/10">
               <CardContent className="p-6 text-center">
                 <Coffee className="w-8 h-8 text-[#FF007F] mx-auto mb-3" />
                 <h3 className="text-lg font-bold mb-2" style={{ fontFamily: 'Outfit' }}>Need a Break?</h3>

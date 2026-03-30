@@ -36,11 +36,11 @@ export default function Leaderboard() {
   };
 
   return (
-    <div className="min-h-screen p-6 lg:p-12 noise-bg" style={{ background: '#09090B' }}>
+    <div className="min-h-screen p-6 lg:p-12 noise-bg bg-slate-50 dark:bg-white dark:bg-zinc-950">
       <div className="max-w-4xl mx-auto">
         <Button onClick={() => navigate('/dashboard')} variant="ghost" className="mb-6">← Back</Button>
         
-        <Card className="border-zinc-800 bg-zinc-950">
+        <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
           <CardHeader>
             <CardTitle className="text-3xl" style={{ fontFamily: 'Outfit' }}>Leaderboard</CardTitle>
             <div className="flex gap-2 mt-4">
@@ -56,7 +56,7 @@ export default function Leaderboard() {
               <div className="space-y-2">
                 {leaderboard.map((entry) => (
                   <motion.div key={entry.rank} whileHover={{ x: 4 }} className={`p-4 rounded-xl border transition-all ${
-                    entry.rank <= 3 ? 'bg-zinc-900 border-[#00F0FF]/30' : 'bg-zinc-900/50 border-zinc-800'
+                    entry.rank <= 3 ? 'bg-zinc-900 border-[#00F0FF]/30' : 'bg-zinc-900/50 border-zinc-200 dark:border-zinc-800'
                   }`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">

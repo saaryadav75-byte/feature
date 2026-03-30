@@ -25,14 +25,16 @@ export default function Login() {
       toast.success('Welcome back!');
       navigate('/dashboard');
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Login failed');
+      console.error('Login error:', error);
+      const message = error.response?.data?.detail || error.message || 'Login failed';
+      toast.error(message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 noise-bg" style={{ background: '#09090B' }}>
+    <div className="min-h-screen flex items-center justify-center p-6 noise-bg bg-slate-50 dark:bg-white dark:bg-zinc-950">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -54,7 +56,7 @@ export default function Login() {
           <p className="text-zinc-400">Sign in to continue your learning journey</p>
         </div>
 
-        <Card className="border-zinc-800 bg-zinc-950 shadow-2xl" data-testid="login-card">
+        <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-2xl" data-testid="login-card">
           <CardHeader>
             <CardTitle className="text-2xl" style={{ fontFamily: 'Outfit' }}>Sign In</CardTitle>
             <CardDescription>Enter your credentials to access your account</CardDescription>
@@ -71,7 +73,7 @@ export default function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   data-testid="login-email-input"
-                  className="bg-zinc-900 border-zinc-800 focus:border-[#00F0FF] transition-colors"
+                  className="bg-zinc-900 border-zinc-200 dark:border-zinc-800 focus:border-[#00F0FF] transition-colors"
                 />
               </div>
               <div className="space-y-2">
@@ -84,7 +86,7 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   data-testid="login-password-input"
-                  className="bg-zinc-900 border-zinc-800 focus:border-[#00F0FF] transition-colors"
+                  className="bg-zinc-900 border-zinc-200 dark:border-zinc-800 focus:border-[#00F0FF] transition-colors"
                 />
               </div>
               <Button
@@ -107,7 +109,7 @@ export default function Login() {
           </CardContent>
         </Card>
 
-        <div className="mt-6 p-4 rounded-xl bg-zinc-900/50 border border-zinc-800">
+        <div className="mt-6 p-4 rounded-xl bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800">
           <p className="text-xs text-zinc-500 mb-2">Demo Accounts:</p>
           <div className="text-xs text-zinc-400 space-y-1">
             <div>Student: student@test.com / password123</div>

@@ -83,7 +83,7 @@ export default function Courses() {
   }
 
   return (
-    <div className="min-h-screen p-6 lg:p-12 noise-bg" style={{ background: '#09090B' }} data-testid="courses-page">
+    <div className="min-h-screen p-6 lg:p-12 noise-bg bg-slate-50 dark:bg-white dark:bg-zinc-950" data-testid="courses-page">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -116,7 +116,7 @@ export default function Courses() {
                 placeholder="Search courses..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-zinc-900 border-zinc-800 focus:border-[#00F0FF]"
+                className="pl-10 bg-zinc-900 border-zinc-200 dark:border-zinc-800 focus:border-[#00F0FF]"
                 data-testid="course-search-input"
               />
             </div>
@@ -132,7 +132,7 @@ export default function Courses() {
           {filteredCourses.map((course) => (
             <motion.div key={course.id} variants={item}>
               <Card
-                className="border-zinc-800 bg-zinc-950 hover:border-[#00F0FF] transition-all cursor-pointer h-full overflow-hidden group"
+                className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:border-[#00F0FF] transition-all cursor-pointer h-full overflow-hidden group"
                 onClick={() => navigate(`/courses/${course.id}`)}
                 data-testid={`course-card-${course.id}`}
               >

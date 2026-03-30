@@ -28,14 +28,16 @@ export default function Register() {
       toast.success('Account created successfully!');
       navigate('/dashboard');
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Registration failed');
+      console.error('Registration error:', error);
+      const message = error.response?.data?.detail || error.message || 'Registration failed';
+      toast.error(message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 noise-bg" style={{ background: '#09090B' }}>
+    <div className="min-h-screen flex items-center justify-center p-6 noise-bg bg-slate-50 dark:bg-white dark:bg-zinc-950">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -57,7 +59,7 @@ export default function Register() {
           <p className="text-zinc-400">Start your adaptive learning journey today</p>
         </div>
 
-        <Card className="border-zinc-800 bg-zinc-950 shadow-2xl" data-testid="register-card">
+        <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-2xl" data-testid="register-card">
           <CardHeader>
             <CardTitle className="text-2xl" style={{ fontFamily: 'Outfit' }}>Create Account</CardTitle>
             <CardDescription>Fill in your details to get started</CardDescription>
@@ -74,7 +76,7 @@ export default function Register() {
                   onChange={(e) => setName(e.target.value)}
                   required
                   data-testid="register-name-input"
-                  className="bg-zinc-900 border-zinc-800 focus:border-[#00F0FF] transition-colors"
+                  className="bg-zinc-900 border-zinc-200 dark:border-zinc-800 focus:border-[#00F0FF] transition-colors"
                 />
               </div>
               <div className="space-y-2">
@@ -87,7 +89,7 @@ export default function Register() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   data-testid="register-email-input"
-                  className="bg-zinc-900 border-zinc-800 focus:border-[#00F0FF] transition-colors"
+                  className="bg-zinc-900 border-zinc-200 dark:border-zinc-800 focus:border-[#00F0FF] transition-colors"
                 />
               </div>
               <div className="space-y-2">
@@ -101,16 +103,16 @@ export default function Register() {
                   required
                   minLength={6}
                   data-testid="register-password-input"
-                  className="bg-zinc-900 border-zinc-800 focus:border-[#00F0FF] transition-colors"
+                  className="bg-zinc-900 border-zinc-200 dark:border-zinc-800 focus:border-[#00F0FF] transition-colors"
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="role">I am a</Label>
                 <Select value={role} onValueChange={setRole}>
-                  <SelectTrigger data-testid="register-role-select" className="bg-zinc-900 border-zinc-800 focus:border-[#00F0FF]">
+                  <SelectTrigger data-testid="register-role-select" className="bg-zinc-900 border-zinc-200 dark:border-zinc-800 focus:border-[#00F0FF]">
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-900 border-zinc-800">
+                  <SelectContent className="bg-zinc-900 border-zinc-200 dark:border-zinc-800">
                     <SelectItem value="student" data-testid="role-option-student">Student</SelectItem>
                     <SelectItem value="instructor" data-testid="role-option-instructor">Instructor</SelectItem>
                   </SelectContent>

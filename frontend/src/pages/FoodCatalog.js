@@ -1,13 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
+import { Separator } from '../components/ui/separator';
 import { motion } from 'framer-motion';
-import { ShoppingCart, Plus, Minus, Sparkles, Clock, TrendingUp, Coffee, X } from 'lucide-react';
+import { CreditCard, Wallet, CheckCircle, ArrowLeft, ShoppingBag, Calendar, Truck, X, Plus, Minus } from 'lucide-react';
 import { toast } from 'sonner';
+import { validateCard, processPayment, createOrder, saveOrder, getStoredOrders } from '../utils/payment';
+
+const MOCK_FOOD_ITEMS = [
+  { id: 'food_1', name: 'Brain Food Platter', category: 'breakfast', price: 8.99, image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400', nutrition_score: 9, description: 'A healthy mix of nuts, fruits, and yogurt' },
+  { id: 'food_2', name: 'Focus Energy Smoothie', category: 'snack', price: 6.99, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=400', nutrition_score: 8, description: 'Green smoothie with matcha for focus' },
+  { id: 'food_3', name: 'Study Lunch Box', category: 'lunch', price: 12.99, image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', nutrition_score: 10, description: 'Balanced meal with protein and grains' },
+  { id: 'food_4', name: 'Evening Brain Boost', category: 'dinner', price: 14.99, image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400', nutrition_score: 9, description: 'Omega-3 rich dinner' },
+  { id: 'food_5', name: 'Protein Power Bowl', category: 'lunch', price: 11.99, image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400', nutrition_score: 9, description: 'High-protein bowl with quinoa' },
+  { id: 'food_6', name: 'Smart Snack Pack', category: 'snack', price: 5.99, image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=400', nutrition_score: 7, description: 'Trail mix with dark chocolate' },
+  { id: 'food_7', name: 'Morning Mind Starter', category: 'breakfast', price: 7.99, image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400', nutrition_score: 8, description: 'Oatmeal with berries' },
+  { id: 'food_8', name: 'Midday Reset Salad', category: 'lunch', price: 10.99, image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400', nutrition_score: 9, description: 'Fresh salad with salmon' },
+  { id: 'food_9', name: 'Pre-Study Coffee', category: 'snack', price: 4.99, image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400', nutrition_score: 6, description: 'Coffee with lion\'s mane' },
+  { id: 'food_10', name: 'Victory Dinner', category: 'dinner', price: 15.99, image: 'https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=400', nutrition_score: 10, description: 'Celebratory meal' },
+];
 
 export default function FoodCatalog() {
   const { user } = useAuth();
@@ -15,13 +34,12 @@ export default function FoodCatalog() {
   const [foodItems, setFoodItems] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [cart, setCart] = useState(() => {
-    // Load cart from localStorage on mount
     const savedCart = localStorage.getItem('cart');
     return savedCart ? JSON.parse(savedCart) : [];
   });
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // Save cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
@@ -32,15 +50,17 @@ export default function FoodCatalog() {
 
   const fetchFoodData = async () => {
     try {
-      const [itemsRes, recoRes] = await Promise.all([
-        api.get('/food-items'),
-        api.get('/food-items/recommend')
-      ]);
-      
-      setFoodItems(itemsRes.data);
-      setRecommendations(recoRes.data.recommended || []);
+      const itemsRes = await api.get('/food-items');
+      if (itemsRes.data && itemsRes.data.length > 0) {
+        setFoodItems(itemsRes.data);
+        setRecommendations(itemsRes.data.slice(0, 3));
+      } else {
+        setFoodItems(MOCK_FOOD_ITEMS);
+        setRecommendations(MOCK_FOOD_ITEMS.slice(0, 3));
+      }
     } catch (error) {
-      console.error('Failed to fetch food data:', error);
+      setFoodItems(MOCK_FOOD_ITEMS);
+      setRecommendations(MOCK_FOOD_ITEMS.slice(0, 3));
     } finally {
       setLoading(false);
     }
@@ -49,16 +69,9 @@ export default function FoodCatalog() {
   const addToCart = (item) => {
     const existingItem = cart.find(i => i.food_id === item.id);
     if (existingItem) {
-      setCart(cart.map(i =>
-        i.food_id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-      ));
+      setCart(cart.map(i => i.food_id === item.id ? { ...i, quantity: i.quantity + 1 } : i));
     } else {
-      setCart([...cart, {
-        food_id: item.id,
-        food_name: item.name,
-        quantity: 1,
-        price: item.price
-      }]);
+      setCart([...cart, { food_id: item.id, food_name: item.name, quantity: 1, price: item.price, image: item.image }]);
     }
     toast.success(`Added ${item.name} to cart`);
   };
@@ -66,106 +79,75 @@ export default function FoodCatalog() {
   const updateQuantity = (foodId, delta) => {
     const updatedCart = cart.map(item => {
       if (item.food_id === foodId) {
-        const newQuantity = item.quantity + delta;
-        return { ...item, quantity: newQuantity };
+        return { ...item, quantity: Math.max(0, item.quantity + delta) };
       }
       return item;
     }).filter(item => item.quantity > 0);
-    
     setCart(updatedCart);
-    
-    // Show notification when item is removed
-    const removedItem = cart.find(item => item.food_id === foodId && item.quantity + delta <= 0);
-    if (removedItem) {
-      toast.info(`${removedItem.food_name} removed from cart`, { icon: '🗑️' });
-    }
   };
 
-  const handleCheckout = async () => {
-    if (cart.length === 0) {
-      toast.error('Your cart is empty');
-      return;
-    }
-
-    try {
-      const response = await api.post('/orders', { items: cart });
-      toast.success(`Order placed! Total: $${response.data.final_price.toFixed(2)} (${(response.data.discount / response.data.total * 100).toFixed(0)}% discount applied)`);
-      setCart([]);
-      localStorage.removeItem('cart'); // Clear cart from localStorage
-    } catch (error) {
-      toast.error('Failed to place order');
-    }
+  const calculateDiscount = () => {
+    const studyHours = user?.total_study_hours || 0;
+    if (studyHours >= 10) return 0.20;
+    if (studyHours >= 5) return 0.15;
+    if (studyHours >= 2) return 0.10;
+    return 0.05;
   };
 
   const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const discount = cartTotal * calculateDiscount();
+  const finalTotal = cartTotal - discount;
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  const filteredItems = selectedCategory === 'all' 
+    ? foodItems 
+    : foodItems.filter(item => item.category === selectedCategory);
+
+  const categories = ['all', 'breakfast', 'snack', 'lunch', 'dinner'];
 
   const container = {
     hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.05 }
-    }
+    show: { opacity: 1, transition: { staggerChildren: 0.05 } }
   };
-
-  const item = {
-    hidden: { opacity: 0, y: 10 },
-    show: { opacity: 1, y: 0 }
-  };
+  const item = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#FF007F] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-zinc-400">Loading food menu...</p>
+          <p className="text-muted-foreground">Loading food menu...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-6 lg:p-12 noise-bg" style={{ background: '#09090B' }} data-testid="food-catalog-page">
+    <div className="min-h-screen p-6 lg:p-8 bg-background dark:bg-zinc-950">
       <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <h1 className="text-4xl lg:text-5xl font-bold mb-2" style={{ fontFamily: 'Outfit' }}>
-            Food & Rewards
-          </h1>
-          <p className="text-zinc-400 text-lg">Fuel your brain with healthy options and earn discounts!</p>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+          <h1 className="text-4xl lg:text-5xl font-bold mb-2" style={{ fontFamily: 'Outfit' }}>Food & Rewards</h1>
+          <p className="text-muted-foreground text-lg">Fuel your brain with healthy options!</p>
         </motion.div>
 
         {recommendations.length > 0 && (
-          <Card className="border-[#FF007F]/30 bg-gradient-to-br from-[#FF007F]/10 to-[#FFE600]/10 mb-8 shadow-[0_0_30px_rgba(255,0,127,0.1)]">
+          <Card className="mb-8" style={{ background: 'linear-gradient(135deg, rgba(255,0,127,0.1), rgba(255,230,0,0.1))' }}>
             <CardHeader>
               <CardTitle className="text-2xl flex items-center gap-2" style={{ fontFamily: 'Outfit' }}>
-                <Sparkles className="w-6 h-6 text-[#FFE600]" />
-                Recommended For You
+                <CheckCircle className="w-6 h-6" style={{ color: '#FFE600' }} /> Recommended For You
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-3 gap-4">
                 {recommendations.slice(0, 3).map((item) => (
-                  <motion.div
-                    key={item.id}
-                    whileHover={{ y: -4 }}
-                    className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 hover:border-[#FF007F] transition-all cursor-pointer"
-                    onClick={() => addToCart(item)}
-                    data-testid={`recommended-food-${item.id}`}
-                  >
-                    <div className="aspect-square rounded-lg bg-zinc-900 mb-3 overflow-hidden">
+                  <motion.div key={item.id} whileHover={{ y: -4 }} className="p-4 rounded-xl bg-secondary dark:bg-zinc-800 border border-border dark:border-zinc-700 cursor-pointer" onClick={() => addToCart(item)}>
+                    <div className="aspect-square rounded-lg bg-muted mb-3 overflow-hidden">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                     <h4 className="font-semibold mb-1">{item.name}</h4>
-                    <p className="text-xs text-zinc-400 mb-2 line-clamp-2">{item.description}</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold" style={{ fontFamily: 'JetBrains Mono', color: '#FFE600' }}>
-                        ${item.price}
-                      </span>
-                      <Badge variant="secondary" className="text-xs">Score: {item.nutrition_score}/10</Badge>
+                      <span className="text-lg font-bold" style={{ fontFamily: 'JetBrains Mono', color: '#FFE600' }}>${item.price}</span>
+                      <Badge variant="secondary">Score: {item.nutrition_score}/10</Badge>
                     </div>
                   </motion.div>
                 ))}
@@ -174,53 +156,42 @@ export default function FoodCatalog() {
           </Card>
         )}
 
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+          {categories.map(cat => (
+            <Button key={cat} variant={selectedCategory === cat ? 'default' : 'outline'} onClick={() => setSelectedCategory(cat)} className="capitalize" style={selectedCategory === cat ? { background: '#FF007F' } : {}}>
+              {cat}
+            </Button>
+          ))}
+        </div>
+
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <Card className="border-zinc-800 bg-zinc-950">
+            <Card className="bg-card border-border dark:border-zinc-700">
               <CardHeader>
                 <CardTitle className="text-2xl flex items-center gap-2" style={{ fontFamily: 'Outfit' }}>
-                  <Coffee className="w-6 h-6 text-[#FF007F]" />
                   All Items
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <motion.div
-                  variants={container}
-                  initial="hidden"
-                  animate="show"
-                  className="grid md:grid-cols-2 gap-4"
-                >
-                  {foodItems.map((foodItem) => (
+                <motion.div variants={container} initial="hidden" animate="show" className="grid md:grid-cols-2 gap-4">
+                  {filteredItems.map((foodItem) => (
                     <motion.div key={foodItem.id} variants={item}>
-                      <Card className="border-zinc-800 bg-zinc-900 hover:border-zinc-700 transition-colors overflow-hidden group" data-testid={`food-item-${foodItem.id}`}>
+                      <Card className="bg-secondary dark:bg-zinc-800 border-border dark:border-zinc-700 hover:border-primary/50 transition-colors overflow-hidden group">
                         <div className="aspect-video overflow-hidden">
-                          <img
-                            src={foodItem.image}
-                            alt={foodItem.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          />
+                          <img src={foodItem.image} alt={foodItem.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                         </div>
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between mb-2">
                             <h3 className="font-semibold text-lg">{foodItem.name}</h3>
                             <Badge variant="outline" className="text-xs">{foodItem.category}</Badge>
                           </div>
-                          <p className="text-sm text-zinc-400 mb-3 line-clamp-2">{foodItem.description}</p>
+                          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{foodItem.description}</p>
                           <div className="flex items-center justify-between">
                             <div>
-                              <span className="text-xl font-bold" style={{ fontFamily: 'JetBrains Mono', color: '#FFE600' }}>
-                                ${foodItem.price}
-                              </span>
-                              <span className="text-xs text-zinc-500 ml-2">Health: {foodItem.nutrition_score}/10</span>
+                              <span className="text-xl font-bold" style={{ fontFamily: 'JetBrains Mono', color: '#FFE600' }}>${foodItem.price}</span>
                             </div>
-                            <Button
-                              size="sm"
-                              onClick={() => addToCart(foodItem)}
-                              className="bg-[#FF007F] hover:bg-[#FF007F]/90 text-white"
-                              data-testid={`add-to-cart-${foodItem.id}`}
-                            >
-                              <Plus className="w-4 h-4 mr-1" />
-                              Add
+                            <Button size="sm" onClick={() => addToCart(foodItem)} style={{ background: '#FF007F' }}>
+                              <Plus className="w-4 h-4 mr-1" /> Add
                             </Button>
                           </div>
                         </CardContent>
@@ -233,118 +204,58 @@ export default function FoodCatalog() {
           </div>
 
           <div>
-            <Card className="border-zinc-800 bg-zinc-950 sticky top-6" data-testid="cart-card">
+            <Card className="bg-card border-border dark:border-zinc-700 sticky top-6">
               <CardHeader>
                 <CardTitle className="text-2xl flex items-center gap-2" style={{ fontFamily: 'Outfit' }}>
-                  <ShoppingCart className="w-6 h-6 text-[#00F0FF]" />
                   Your Cart
-                  {cartItemCount > 0 && (
-                    <Badge className="ml-auto bg-[#FF007F]">{cartItemCount}</Badge>
-                  )}
+                  {cartItemCount > 0 && <Badge style={{ background: '#FF007F' }}>{cartItemCount}</Badge>}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {cart.length === 0 ? (
-                  <div className="text-center py-8 text-zinc-500">
-                    <ShoppingCart className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                  <div className="text-center py-8 text-muted-foreground">
+                    <ShoppingBag className="w-12 h-12 mx-auto mb-3 opacity-30" />
                     <p>Your cart is empty</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {cart.map((cartItem) => (
-                      <div key={cartItem.food_id} className="flex items-center gap-3 p-3 rounded-lg bg-zinc-900 border border-zinc-800">
+                      <div key={cartItem.food_id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary dark:bg-zinc-800 border border-border dark:border-zinc-700">
+                        <img src={cartItem.image} alt={cartItem.food_name} className="w-12 h-12 rounded object-cover" />
                         <div className="flex-1">
                           <p className="font-semibold text-sm">{cartItem.food_name}</p>
-                          <p className="text-xs text-zinc-500">${cartItem.price} each</p>
+                          <p className="text-xs text-muted-foreground">${cartItem.price}</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 w-7 p-0"
-                            onClick={() => updateQuantity(cartItem.food_id, -1)}
-                            data-testid={`decrease-qty-${cartItem.food_id}`}
-                          >
-                            <Minus className="w-3 h-3" />
-                          </Button>
-                          <span className="text-sm font-bold w-8 text-center" style={{ fontFamily: 'JetBrains Mono' }}>
-                            {cartItem.quantity}
-                          </span>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 w-7 p-0"
-                            onClick={() => updateQuantity(cartItem.food_id, 1)}
-                            data-testid={`increase-qty-${cartItem.food_id}`}
-                          >
-                            <Plus className="w-3 h-3" />
-                          </Button>
+                          <Button size="sm" variant="outline" className="h-7 w-7 p-0" onClick={() => updateQuantity(cartItem.food_id, -1)}><Minus className="w-3 h-3" /></Button>
+                          <span className="text-sm font-bold w-6 text-center">{cartItem.quantity}</span>
+                          <Button size="sm" variant="outline" className="h-7 w-7 p-0" onClick={() => updateQuantity(cartItem.food_id, 1)}><Plus className="w-3 h-3" /></Button>
                         </div>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 w-7 p-0 text-zinc-500 hover:text-red-400 hover:bg-red-400/10"
-                          onClick={() => {
-                            setCart(cart.filter(item => item.food_id !== cartItem.food_id));
-                            toast.info(`${cartItem.food_name} removed from cart`, { icon: '🗑️' });
-                          }}
-                          data-testid={`remove-item-${cartItem.food_id}`}
-                          title="Remove item"
-                        >
-                          <X className="w-3 h-3" />
-                        </Button>
                       </div>
                     ))}
 
-                    <div className="border-t border-zinc-800 pt-4 space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-zinc-400">Subtotal</span>
-                        <span className="font-semibold" style={{ fontFamily: 'JetBrains Mono' }}>
-                          ${cartTotal.toFixed(2)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-zinc-400 flex items-center gap-1">
-                          <TrendingUp className="w-3 h-3" />
-                          Study Discount
-                        </span>
-                        <span className="font-semibold text-[#39FF14]" style={{ fontFamily: 'JetBrains Mono' }}>
-                          {user?.total_study_hours >= 10 ? '20%' : user?.total_study_hours >= 5 ? '15%' : user?.total_study_hours >= 2 ? '10%' : '5%'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between text-lg font-bold pt-2 border-t border-zinc-800">
+                    <Separator />
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span>${cartTotal.toFixed(2)}</span></div>
+                      <div className="flex justify-between text-sm"><span className="text-muted-foreground">Discount ({(calculateDiscount() * 100).toFixed(0)}%)</span><span style={{ color: '#39FF14' }}>-${discount.toFixed(2)}</span></div>
+                      <div className="flex justify-between text-lg font-bold pt-2 border-t border-border dark:border-zinc-700">
                         <span>Total</span>
-                        <span style={{ fontFamily: 'JetBrains Mono', color: '#FFE600' }}>
-                          ${(cartTotal * (1 - (user?.total_study_hours >= 10 ? 0.2 : user?.total_study_hours >= 5 ? 0.15 : user?.total_study_hours >= 2 ? 0.1 : 0.05))).toFixed(2)}
-                        </span>
+                        <span style={{ color: '#FFE600' }}>${finalTotal.toFixed(2)}</span>
                       </div>
                     </div>
 
-                    <Button
-                      onClick={handleCheckout}
-                      className="w-full bg-[#FF007F] hover:bg-[#FF007F]/90 text-white font-semibold text-lg py-6"
-                      data-testid="checkout-button"
-                    >
-                      Place Order
+                    <Button onClick={() => navigate('/checkout', { state: { cart, total: finalTotal } })} className="w-full text-white font-semibold py-6" style={{ background: '#FF007F' }}>
+                      Proceed to Checkout
                     </Button>
                   </div>
                 )}
 
-                <div className="mt-6 p-4 rounded-lg bg-gradient-to-br from-[#00F0FF]/10 to-[#39FF14]/10 border border-zinc-800">
-                  <p className="text-xs text-zinc-400 mb-2">💡 Study More, Save More!</p>
-                  <div className="space-y-1 text-xs text-zinc-500">
-                    <div className="flex justify-between">
-                      <span>2+ hours: 10% off</span>
-                      <span className={user?.total_study_hours >= 2 ? 'text-[#39FF14]' : ''}>✓</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>5+ hours: 15% off</span>
-                      <span className={user?.total_study_hours >= 5 ? 'text-[#39FF14]' : ''}>✓</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>10+ hours: 20% off</span>
-                      <span className={user?.total_study_hours >= 10 ? 'text-[#39FF14]' : ''}>✓</span>
-                    </div>
+                <div className="mt-6 p-4 rounded-lg border border-border dark:border-zinc-700" style={{ background: 'linear-gradient(135deg, rgba(0,240,255,0.1), rgba(57,255,20,0.1))' }}>
+                  <p className="text-xs text-muted-foreground mb-2">Study More, Save More!</p>
+                  <div className="space-y-1 text-xs text-muted-foreground">
+                    <div className="flex justify-between"><span>2+ hours: 10% off</span><span style={{ color: (user?.total_study_hours || 0) >= 2 ? '#39FF14' : '' }}>{(user?.total_study_hours || 0) >= 2 ? '✓' : ''}</span></div>
+                    <div className="flex justify-between"><span>5+ hours: 15% off</span><span style={{ color: (user?.total_study_hours || 0) >= 5 ? '#39FF14' : '' }}>{(user?.total_study_hours || 0) >= 5 ? '✓' : ''}</span></div>
+                    <div className="flex justify-between"><span>10+ hours: 20% off</span><span style={{ color: (user?.total_study_hours || 0) >= 10 ? '#39FF14' : '' }}>{(user?.total_study_hours || 0) >= 10 ? '✓' : ''}</span></div>
                   </div>
                 </div>
               </CardContent>

@@ -49,7 +49,7 @@ export default function CreateCourse() {
   }
 
   return (
-    <div className="min-h-screen p-6 lg:p-12 noise-bg" style={{ background: '#09090B' }}>
+    <div className="min-h-screen p-6 lg:p-12 noise-bg bg-slate-50 dark:bg-white dark:bg-zinc-950">
       <div className="max-w-3xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -64,7 +64,7 @@ export default function CreateCourse() {
             Back to Courses
           </Button>
 
-          <Card className="border-zinc-800 bg-zinc-950">
+          <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
             <CardHeader>
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-12 h-12 rounded-xl bg-[#00F0FF]/10 flex items-center justify-center">
@@ -84,7 +84,7 @@ export default function CreateCourse() {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
-                    className="bg-zinc-900 border-zinc-800 focus:border-[#00F0FF]"
+                    className="bg-zinc-900 border-zinc-200 dark:border-zinc-800 focus:border-[#00F0FF]"
                     data-testid="course-title-input"
                   />
                 </div>
@@ -98,7 +98,7 @@ export default function CreateCourse() {
                     onChange={(e) => setDescription(e.target.value)}
                     required
                     rows={6}
-                    className="bg-zinc-900 border-zinc-800 focus:border-[#00F0FF] resize-none"
+                    className="bg-zinc-900 border-zinc-200 dark:border-zinc-800 focus:border-[#00F0FF] resize-none"
                     data-testid="course-description-input"
                   />
                 </div>

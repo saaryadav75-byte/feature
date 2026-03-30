@@ -5,9 +5,13 @@ import os
 import logging
 from pathlib import Path
 
-from models.database import connect_to_mongo, close_mongo_connection
+from models.database import connect_to_supabase, close_supabase_connection
 from routers import auth, courses, lessons, progress, focus_sessions, food, dashboard, gamification, learning, analytics, checkout
 from utils.seed import seed_database
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -15,6 +19,11 @@ load_dotenv(ROOT_DIR / '.env')
 app = FastAPI(title="Smart Adaptive Learning Platform", version="2.0")
 
 api_router = APIRouter(prefix="/api")
+
+# Health check endpoint
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "message": "SmartLearn backend is running"}
 
 api_router.include_router(auth.router)
 api_router.include_router(courses.router)
@@ -41,13 +50,19 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    await connect_to_mongo()
-    await seed_database()
-    logging.info("Application started successfully")
+    try:
+        await connect_to_supabase()
+        logger.info("✅ Supabase REST API connected at startup")
+        # Optional: seed database if needed
+        # await seed_database()
+    except Exception as e:
+        logger.warning(f"⚠️ Could not connect to Supabase at startup: {e}")
+        logger.warning("💡 Continuing anyway - API will use mock data if database is unavailable")
+    logger.info("Application startup complete")
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    await close_mongo_connection()
+    await close_supabase_connection()
     logging.info("Application shutdown complete")
 
 logging.basicConfig(

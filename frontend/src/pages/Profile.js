@@ -44,7 +44,7 @@ export default function Profile() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#00F0FF] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-zinc-400">Loading profile...</p>
+          <p className="text-zinc-400 dark:text-zinc-400">Loading profile...</p>
         </div>
       </div>
     );
@@ -53,7 +53,7 @@ export default function Profile() {
   const levelProgress = stats ? ((stats.total_xp % 100) / 100) * 100 : 0;
 
   return (
-    <div className="min-h-screen p-6 lg:p-12 noise-bg" style={{ background: '#09090B' }} data-testid="profile-page">
+    <div className="min-h-screen p-6 lg:p-12 noise-bg bg-slate-50 dark:bg-white dark:bg-zinc-950 dark:bg-zinc-900" data-testid="profile-page">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -62,14 +62,14 @@ export default function Profile() {
           <Button
             onClick={() => navigate('/dashboard')}
             variant="ghost"
-            className="mb-6 text-zinc-400 hover:text-white"
+            className="mb-6 text-zinc-400 dark:text-zinc-400 hover:text-white"
           >
             ← Back to Dashboard
           </Button>
 
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              <Card className="border-zinc-800 bg-zinc-950">
+              <Card className="border-zinc-800 dark:border-zinc-700 dark:border-zinc-700 bg-white dark:bg-zinc-950">
                 <CardContent className="p-8">
                   <div className="flex items-center gap-6 mb-6">
                     <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#00F0FF] to-[#39FF14] flex items-center justify-center">
@@ -77,7 +77,7 @@ export default function Profile() {
                     </div>
                     <div>
                       <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Outfit' }}>{user?.name}</h1>
-                      <p className="text-zinc-400">{user?.email}</p>
+                      <p className="text-zinc-400 dark:text-zinc-400">{user?.email}</p>
                       <Badge className="mt-2 bg-[#00F0FF] text-black">
                         Level {stats?.level || 1}
                       </Badge>
@@ -87,7 +87,7 @@ export default function Profile() {
                   <div className="space-y-4">
                     <div>
                       <div className="flex justify-between text-sm mb-2">
-                        <span className="text-zinc-400">XP Progress</span>
+                        <span className="text-zinc-400 dark:text-zinc-400">XP Progress</span>
                         <span className="font-semibold" style={{ fontFamily: 'JetBrains Mono', color: '#00F0FF' }}>
                           {stats?.total_xp || 0} XP
                         </span>
@@ -101,7 +101,7 @@ export default function Profile() {
                 </CardContent>
               </Card>
 
-              <Card className="border-zinc-800 bg-zinc-950">
+              <Card className="border-zinc-800 dark:border-zinc-700 bg-white dark:bg-zinc-950 dark:bg-zinc-900">
                 <CardHeader>
                   <CardTitle className="text-2xl flex items-center gap-2" style={{ fontFamily: 'Outfit' }}>
                     <Trophy className="w-6 h-6 text-[#FFE600]" />
@@ -120,13 +120,13 @@ export default function Profile() {
                         <motion.div
                           key={achievement.id}
                           whileHover={{ scale: 1.02 }}
-                          className="p-4 rounded-xl bg-zinc-900 border border-zinc-800"
+                          className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 dark:border-zinc-700"
                         >
                           <div className="flex items-center gap-3">
                             <div className="text-4xl">{achievement.details?.icon || '🏆'}</div>
                             <div className="flex-1">
                               <h4 className="font-semibold">{achievement.details?.name}</h4>
-                              <p className="text-xs text-zinc-400">{achievement.details?.description}</p>
+                              <p className="text-xs text-zinc-400 dark:text-zinc-400">{achievement.details?.description}</p>
                               <Badge variant="outline" className="mt-2 text-xs">
                                 +{achievement.details?.coins_reward} coins
                               </Badge>
@@ -151,8 +151,8 @@ export default function Profile() {
                     <div className="text-5xl font-bold mb-2" style={{ fontFamily: 'JetBrains Mono', color: '#FF3B30' }}>
                       {streak?.current_streak || 0}
                     </div>
-                    <p className="text-sm text-zinc-400 mb-4">days in a row</p>
-                    <div className="p-3 rounded-lg bg-zinc-950 border border-zinc-800">
+                    <p className="text-sm text-zinc-400 dark:text-zinc-400 mb-4">days in a row</p>
+                    <div className="p-3 rounded-lg bg-white dark:bg-zinc-950 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-700">
                       <p className="text-xs text-zinc-500">Longest Streak</p>
                       <p className="text-lg font-bold" style={{ color: '#FFE600' }}>
                         {streak?.longest_streak || 0} days
@@ -162,7 +162,7 @@ export default function Profile() {
                 </CardContent>
               </Card>
 
-              <Card className="border-zinc-800 bg-zinc-950">
+              <Card className="border-zinc-800 dark:border-zinc-700 bg-white dark:bg-zinc-950 dark:bg-zinc-900">
                 <CardContent className="p-6">
                   <h3 className="text-lg font-bold mb-4" style={{ fontFamily: 'Outfit' }}>Quick Stats</h3>
                   <div className="space-y-3">
@@ -206,7 +206,7 @@ export default function Profile() {
                 </CardContent>
               </Card>
 
-              <Card className="border-zinc-800 bg-zinc-950">
+              <Card className="border-zinc-800 dark:border-zinc-700 bg-white dark:bg-zinc-950 dark:bg-zinc-900">
                 <CardContent className="p-6 text-center">
                   <h3 className="text-lg font-bold mb-4" style={{ fontFamily: 'Outfit' }}>View More</h3>
                   <div className="space-y-2">
