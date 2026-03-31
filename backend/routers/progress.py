@@ -58,3 +58,30 @@ async def get_course_progress(course_id: str, current_user: dict = Depends(get_c
         return response.data
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching course progress: {str(e)}")
+
+@router.get("/enrolled")
+async def get_enrolled_courses(current_user: dict = Depends(get_current_user)):
+    client = get_supabase_client()
+    if not client:
+        return []
+    
+    try:
+        enrollments_response = client.table('enrollments').select('course_id,enrolled_at').eq('user_id', current_user['user_id']).execute()
+        
+        enrolled_courses = []
+        for enrollment in enrollments_response.data:
+            course_id = enrollment['course_id']
+            course_response = client.table('courses').select('*').eq('id', course_id).execute()
+            if course_response.data:
+                course = course_response.data[0]
+                progress_response = client.table('progress').select('completion_percentage').eq('user_id', current_user['user_id']).eq('course_id', course_id).execute()
+                progress = progress_response.data[0]['completion_percentage'] if progress_response.data else 0
+                enrolled_courses.append({
+                    **course,
+                    'progress_percentage': progress,
+                    'enrolled_at': enrollment['enrolled_at']
+                })
+        
+        return enrolled_courses
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching enrolled courses: {str(e)}")

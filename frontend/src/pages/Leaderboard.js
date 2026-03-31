@@ -56,21 +56,21 @@ export default function Leaderboard() {
               <div className="space-y-2">
                 {leaderboard.map((entry) => (
                   <motion.div key={entry.rank} whileHover={{ x: 4 }} className={`p-4 rounded-xl border transition-all ${
-                    entry.rank <= 3 ? 'bg-zinc-900 border-[#00F0FF]/30' : 'bg-zinc-900/50 border-zinc-200 dark:border-zinc-800'
+                    entry.rank <= 3 ? 'bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-950/50 dark:to-blue-950/50 border-cyan-200 dark:border-cyan-800' : 'bg-gradient-to-r from-zinc-50 to-gray-50 dark:from-zinc-900/50 dark:to-zinc-800/50 border-zinc-200 dark:border-zinc-700'
                   }`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="w-10 flex items-center justify-center">{getMedalIcon(entry.rank)}</div>
                         <div>
-                          <p className="font-semibold">{entry.name}</p>
-                          <p className="text-xs text-zinc-500">Rank #{entry.rank}</p>
+                          <p className="font-semibold text-gray-900 dark:text-white">{entry.name}</p>
+                          <p className="text-xs text-gray-500 dark:text-zinc-400">Rank #{entry.rank}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold" style={{ fontFamily: 'JetBrains Mono', color: '#00F0FF' }}>
+                        <p className="text-2xl font-bold" style={{ fontFamily: 'JetBrains Mono', color: '#0891b2' }}>
                           {entry.value.toFixed(metric === 'total_study_hours' ? 1 : 0)}
                         </p>
-                        <p className="text-xs text-zinc-500">{metric.replace('_', ' ')}</p>
+                        <p className="text-xs text-gray-500 dark:text-zinc-400">{metric.replace('_', ' ')}</p>
                       </div>
                     </div>
                   </motion.div>

@@ -29,37 +29,24 @@ export default function Dashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const [statsRes, coursesRes, heatmapRes, gamificationRes] = await Promise.all([
+      const [statsRes, coursesRes, enrolledCoursesRes, heatmapRes, gamificationRes] = await Promise.all([
         api.get('/dashboard/stats'),
         api.get('/courses'),
+        api.get('/progress/enrolled'),
         api.get(`/analytics/heatmap/${user.id}`),
         api.get('/gamification/stats')
       ]);
       
       setStats(statsRes.data);
       setCourses(coursesRes.data);
+      setEnrolledCourses(enrolledCoursesRes.data);
       setHeatmapData(heatmapRes.data);
       setGamificationStats(gamificationRes.data);
       
-      const enrollmentsPromises = coursesRes.data.map(course =>
-        api.get(`/progress/course/${course.id}`).catch(() => null)
-      );
-      const enrollments = await Promise.all(enrollmentsPromises);
-      
-      const enrolled = coursesRes.data.filter((_, idx) => 
-        enrollments[idx] && enrollments[idx].data && enrollments[idx].data.length > 0
-      );
-      
       const progressMap = {};
-      enrollments.forEach((enrollment, idx) => {
-        if (enrollment && enrollment.data && enrollment.data.length > 0) {
-          const courseId = coursesRes.data[idx].id;
-          const progress = enrollment.data[0].progress_percentage || 0;
-          progressMap[courseId] = progress;
-        }
+      enrolledCoursesRes.data.forEach(course => {
+        progressMap[course.id] = course.progress_percentage || 0;
       });
-      
-      setEnrolledCourses(enrolled);
       setCourseProgress(progressMap);
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);

@@ -49,6 +49,12 @@ export default function Courses() {
 
   const handleEnroll = async (courseId, e) => {
     e.stopPropagation();
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.error('Please log in to enroll in courses');
+      navigate('/login');
+      return;
+    }
     try {
       await api.post(`/courses/${courseId}/enroll`);
       toast.success('Enrolled successfully!');

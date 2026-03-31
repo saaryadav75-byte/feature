@@ -45,7 +45,11 @@ async def create_course(course_data: CourseCreate, current_user: dict = Depends(
             'instructor_name': user_name,
             'thumbnail': course_data.thumbnail,
             'created_at': datetime.now(timezone.utc).isoformat(),
-            'students_enrolled': 0
+            'students_enrolled': 0,
+            'price': course_data.price,
+            'category': course_data.category,
+            'difficulty': course_data.difficulty,
+            'rating': 0.0
         }
         
         client.table('courses').insert(course_insert).execute()
@@ -89,14 +93,16 @@ async def enroll_course(course_id: str, current_user: dict = Depends(get_current
         if existing_response.data:
             return {"message": "Already enrolled"}
 
-        # Create enrollment
-        enrollment_id = f"enrollment_{datetime.now(timezone.utc).timestamp()}"
+        # Create enrollment using UUID
+        import uuid
+        enrollment_id = str(uuid.uuid4())
         
         enrollment_data = {
             'id': enrollment_id,
             'user_id': current_user['user_id'],
             'course_id': course_id,
-            'enrolled_at': datetime.now(timezone.utc).isoformat()
+            'enrolled_at': datetime.now(timezone.utc).isoformat(),
+            'progress_percentage': 0.0
         }
         client.table('enrollments').insert(enrollment_data).execute()
 
